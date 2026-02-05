@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.28)
 project(ub VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 23)
@@ -7,6 +7,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 file(GLOB SOURCES "src/*.cpp")
 add_executable(ub ${SOURCES})
+target_include_directories(ub PRIVATE ${CMAKE_SOURCE_DIR})
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(ub PRIVATE 
