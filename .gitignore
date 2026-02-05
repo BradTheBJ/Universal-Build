@@ -10,3 +10,12 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 CMakeUserPresets.json
+
+# IDE spesific files/folders
+.idea
+cmake-build-debug
+cmake-build-release
+
+# Temporary files
+/bin
+run.ps1
