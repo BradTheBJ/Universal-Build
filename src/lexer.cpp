@@ -1,8 +1,8 @@
 #include "include/lexer.hpp"
 #include <fstream>
-#include <stdexcept>
-#include <format>
 #include <iostream>
+#include <format>
+#include <cctype>
 
 std::vector<Token> lexResult;
 
@@ -15,33 +15,35 @@ void lex() {
 
 	std::string buffer;
 	char c;
-	while(file.get(c)) {
+	while (file.get(c)) {
 		if (buffer.empty() && std::isspace(c)) {
+			continue;
+		}
+
+		if (c == '#') {
+			while (file.get(c) && c != '\n') {}
+			buffer.clear();
 			continue;
 		}
 
 		buffer += c;
 
 		if (c == ')') {
+			Token token;
 			if (buffer.starts_with("setCompiler")) {
-				Token token;
 				token.type = TokenType::SET_COMPILER;
-				token.value = buffer;
-				lexResult.push_back(token);
-				buffer.clear();
 			} else if (buffer.starts_with("addFlag")) {
-				Token token;
 				token.type = TokenType::ADD_FLAG;
-				token.value = buffer;
-				lexResult.push_back(token);
-				buffer.clear();
 			} else if (buffer.starts_with("exec")) {
-				Token token;
 				token.type = TokenType::EXEC;
-				token.value = buffer;
-				lexResult.push_back(token);
+			} else {
 				buffer.clear();
+				continue;
 			}
+
+			token.value = buffer;
+			lexResult.push_back(token);
+			buffer.clear();
 		}
 	}
 }

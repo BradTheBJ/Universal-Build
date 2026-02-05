@@ -20,7 +20,7 @@ Here is a very minimal example (**the current version**):
 
 ```ub
 setCompiler(clang) # Set the compiler to clang
-addFlags(-o -Wall example example.cpp) # Add flags to the compiler of choice
+addFlags(-o example example.c) # Add flags to the compiler of choice
 exec() # Executes <compiler> <flags>
 ```
 To use it, install the latest interpreter from [RELEASES] and add it to your environment path.

@@ -8,6 +8,7 @@ std::string compiler;
 std::pair<std::string, std::vector<std::string>> execCommand;
 
 void parse(const std::vector<Token> &tokens) {
+	int line = 1;
 	for (const auto &token : tokens) {
 		switch (token.type) {
 		case TokenType::SET_COMPILER: {
@@ -18,35 +19,32 @@ void parse(const std::vector<Token> &tokens) {
 			std::string content = getContentOfParens(token.value);
 			size_t pos = 0;
 			while (pos < content.size()) {
-				while (pos < content.size() && std::isspace(content[pos])) {
-					pos++;
-				}
-				if (pos >= content.size()) {
-					break;
-				}
+				while (pos < content.size() && std::isspace(content[pos])) pos++;
+				if (pos >= content.size()) break;
 				size_t next = content.find(' ', pos);
-				if (next == std::string::npos) {
-					next = content.size();
-				}
+				if (next == std::string::npos) next = content.size();
 				flags.push_back(content.substr(pos, next - pos));
 				pos = next;
 			}
 			break;
 		}
 		case TokenType::EXEC: {
-            if (!compiler.empty()) {
-                std::string fullCommand = compiler;
-                for (const auto &f : flags) {
-                    fullCommand += " " + f;
-                }
-                std::system(fullCommand.c_str());
-            } else {
-                std::cout << "\033[31m" << std::format("No compiler set for exec command\n") << "\033[0m";
-                std::exit(1);
-            }
-            flags.clear();
-            break;
-        }
+			if (!compiler.empty()) {
+				std::string fullCommand = compiler;
+				for (const auto &f : flags) fullCommand += " " + f;
+				std::system(fullCommand.c_str());
+			} else {
+				std::cerr << "\033[31m" << std::format("No compiler set for exec command at line {}\n", line) << "\033[0m";
+				std::exit(1);
+			}
+			flags.clear();
+			break;
 		}
+		default: {
+			std::cerr << "\033[31m" << std::format("Unknown token '{}' at line {}\n", token.value, line) << "\033[0m";
+			std::exit(1);
+		}
+		}
+		line++;
 	}
 }
