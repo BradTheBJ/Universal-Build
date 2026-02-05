@@ -3,11 +3,11 @@
 #include <string>
 
 enum class TokenType {
-    EOF_TOKEN,
     ADD_FLAG,
     SET_COMPILER,
     EXEC,
-    UNKNOWN
+    //UNKNOWN
+    // TODO: Add more token types as needed and implement token UNKNOWN
 };
 
 struct Token {
