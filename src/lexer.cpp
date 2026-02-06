@@ -36,6 +36,8 @@ void lex() {
 				token.type = TokenType::ADD_FLAG;
 			} else if (buffer.starts_with("exec")) {
 				token.type = TokenType::EXEC;
+			} else if (buffer.starts_with("detectCompiler")) {
+				token.type = TokenType::DETECT_COMPILER;
 			} else {
 				buffer.clear();
 				continue;

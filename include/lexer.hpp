@@ -5,8 +5,8 @@
 enum class TokenType {
     ADD_FLAG,
     SET_COMPILER,
-    EXEC,
-    // TODO: Add more token types as needed
+    DETECT_COMPILER,
+    EXEC
 };
 
 struct Token {

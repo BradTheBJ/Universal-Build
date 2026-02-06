@@ -40,6 +40,33 @@ void parse(const std::vector<Token> &tokens) {
 			flags.clear();
 			break;
 		}
+		case TokenType::DETECT_COMPILER: {
+			std::string content = getContentOfParens(token.value);
+			if (content == "c") {
+				if (std::system("gcc --version") == 0) {
+					compiler = "gcc";
+				} else if (std::system("clang --version") == 0) {
+					compiler = "clang";
+				} else {
+					std::cerr << "\033[31m" << std::format("Could not detect C compiler at line {}\n", line) << "\033[0m";
+					std::exit(1);
+				}
+			} else if (content == "cpp" || content == "c++" || content == "cxx") {
+				if (std::system("g++ --version") == 0) {
+					compiler = "g++";
+				} else if (std::system("clang++ --version") == 0) {
+					compiler = "clang++";
+				} else {
+					std::cerr << "\033[31m" << std::format("Could not detect C++ compiler at line {}\n", line) << "\033[0m";
+					std::exit(1);
+				}
+			} else {
+				std::cerr << "\033[31m" << std::format("Unknown language '{}' for detectCompiler at line {}\n", content, line) << "\033[0m";
+				std::exit(1);
+			}
+			std::cout << "\033[32m" << std::format("Detected compiler: {}\n", compiler) << "\033[0m";
+			break;
+		}
 		default: {
 			std::cerr << "\033[31m" << std::format("Unknown token '{}' at line {}\n", token.value, line) << "\033[0m";
 			std::exit(1);
