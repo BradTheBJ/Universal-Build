@@ -1,77 +1,43 @@
 #include "include/parser.hpp"
-#include "helpers/getContentOfParens.hpp"
-#include <iostream>
+#include "methods/addFlag.hpp"
+#include "methods/detectCompiler.hpp"
+#include "methods/exec.hpp"
+#include "methods/setCompiler.hpp"
 #include <format>
+#include <iostream>
 
 std::vector<std::string> flags;
 std::string compiler;
 std::pair<std::string, std::vector<std::string>> execCommand;
 
 void parse(const std::vector<Token> &tokens) {
-	int line = 1;
-	for (const auto &token : tokens) {
-		switch (token.type) {
-		case TokenType::SET_COMPILER: {
-			compiler = getContentOfParens(token.value);
-			break;
-		}
-		case TokenType::ADD_FLAG: {
-			std::string content = getContentOfParens(token.value);
-			size_t pos = 0;
-			while (pos < content.size()) {
-				while (pos < content.size() && std::isspace(content[pos])) pos++;
-				if (pos >= content.size()) break;
-				size_t next = content.find(' ', pos);
-				if (next == std::string::npos) next = content.size();
-				flags.push_back(content.substr(pos, next - pos));
-				pos = next;
-			}
-			break;
-		}
-		case TokenType::EXEC: {
-			if (!compiler.empty()) {
-				std::string fullCommand = compiler;
-				for (const auto &f : flags) fullCommand += " " + f;
-				std::system(fullCommand.c_str());
-			} else {
-				std::cerr << "\033[31m" << std::format("No compiler set for exec command at line {}\n", line) << "\033[0m";
-				std::exit(1);
-			}
-			flags.clear();
-			break;
-		}
-		case TokenType::DETECT_COMPILER: {
-			std::string content = getContentOfParens(token.value);
-			if (content == "c") {
-				if (std::system("gcc --version") == 0) {
-					compiler = "gcc";
-				} else if (std::system("clang --version") == 0) {
-					compiler = "clang";
-				} else {
-					std::cerr << "\033[31m" << std::format("Could not detect C compiler at line {}\n", line) << "\033[0m";
-					std::exit(1);
-				}
-			} else if (content == "cpp" || content == "c++" || content == "cxx") {
-				if (std::system("g++ --version") == 0) {
-					compiler = "g++";
-				} else if (std::system("clang++ --version") == 0) {
-					compiler = "clang++";
-				} else {
-					std::cerr << "\033[31m" << std::format("Could not detect C++ compiler at line {}\n", line) << "\033[0m";
-					std::exit(1);
-				}
-			} else {
-				std::cerr << "\033[31m" << std::format("Unknown language '{}' for detectCompiler at line {}\n", content, line) << "\033[0m";
-				std::exit(1);
-			}
-			std::cout << "\033[32m" << std::format("Detected compiler: {}\n", compiler) << "\033[0m";
-			break;
-		}
-		default: {
-			std::cerr << "\033[31m" << std::format("Unknown token '{}' at line {}\n", token.value, line) << "\033[0m";
-			std::exit(1);
-		}
-		}
-		line++;
-	}
+  size_t line = 1;
+  for (const auto &token : tokens) {
+    switch (token.type) {
+    case TokenType::SET_COMPILER: {
+      compiler = setCompiler(const_cast<Token &>(token));
+      break;
+    }
+    case TokenType::ADD_FLAG: {
+      addFlag(flags, const_cast<Token &>(token));
+      break;
+    }
+    case TokenType::EXEC: {
+      exec(compiler, flags, line);
+      break;
+    }
+    case TokenType::DETECT_COMPILER: {
+      compiler = detectCompiler(compiler, const_cast<Token &>(token), line);
+      break;
+    }
+    default: {
+      std::cerr << "\033[31m"
+                << std::format("Unknown token '{}' at line {}\n", token.value,
+                               line)
+                << "\033[0m";
+      std::exit(1);
+    }
+    }
+    line++;
+  }
 }

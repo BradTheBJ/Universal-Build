@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-file(GLOB SOURCES "src/*.cpp" "helpers/*.cpp")
+file(GLOB SOURCES "src/*.cpp" "helpers/*.cpp" "src/methods/*.cpp")
 add_executable(ub ${SOURCES})
 target_include_directories(ub PRIVATE ${CMAKE_SOURCE_DIR})
 
